@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rihal — رحال</title>
+<style>
+:root{--bg:#0F1B2A;--surface:#16273B;--surface-2:#1D3149;--line:#2A3F58;--gold:#C9A227;--teal:#2FA793;--text:#EDEFF2;--muted:#8FA3B8;--danger:#C9584A;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',Tahoma,Arial,sans-serif;line-height:1.6;}
+header{display:flex;justify-content:space-between;align-items:center;padding:20px 6%;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px;}
+.brand{font-size:20px;font-weight:700;}
+.brand span{color:var(--gold);}
+.lang-toggle{background:transparent;border:1px solid var(--line);color:var(--muted);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;}
+.hero{padding:50px 6% 34px;max-width:760px;}
+.hero h1{font-size:30px;margin:0 0 14px;font-weight:700;}
+.hero p{color:var(--muted);font-size:15px;}
+.btn{padding:12px 24px;border-radius:7px;font-size:14.5px;font-weight:600;cursor:pointer;border:none;margin-inline-end:10px;}
+.btn-gold{background:var(--gold);color:#1A1200;}
+.cat-grid{padding:10px 6% 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.cat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;text-align:center;}
+.cat .icon{font-size:24px;margin-bottom:8px;}
+.cat .name{font-size:13px;font-weight:600;}
+footer{padding:26px 6%;color:var(--muted);font-size:12px;border-top:1px solid var(--line);}
+@media (max-width:720px){.cat-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">رحـال <span>Rihal</span></div>
+  <button class="lang-toggle">EN</button>
+</header>
+<div class="hero">
+  <h1>كل الخدمات، كل المهارات، فمكان واحد وموثوق</h1>
+  <p>اعرض خدماتك، بيع واشري، ترجم، تبادل — بحماية روبوت ذكي وتوثيق هوية إلزامي لكل مستخدم.</p>
+  <button class="btn btn-gold">أضف خدمتك</button>
+</div>
+<div class="cat-grid">
+  <div class="cat"><div class="icon">🛠️</div><div class="name">حرفيون</div></div>
+  <div class="cat"><div class="icon">🎨</div><div class="name">تصميم</div></div>
+  <div class="cat"><div class="icon">💻</div><div class="name">برمجة</div></div>
+  <div class="cat"><div class="icon">🌐</div><div class="name">ترجمة</div></div>
+</div>
+<footer>نموذج أولي — Rihal Platform</footer>
+</body>
+</html>
+<script>
+const rp=document.createElement('section');
+rp.className='panel';
+rp.id='registerPanel';
+rp.innerHTML=`
+<h2>إنشاء حساب في رحال</h2>
+<p class="sub">سجل حسابك بالبريد الإلكتروني أو رقم الهاتف.</p>
+<div class="admin-box">
+<input id="regName" placeholder="الاسم الكامل">
+<input id="regEmail" type="email" placeholder="البريد الإلكتروني">
+<input id="regPhone" type="tel" placeholder="رقم الهاتف">
+<input id="regPassword" type="password" placeholder="كلمة المرور">
+<input id="regPassword2" type="password" placeholder="تأكيد كلمة المرور">
+<div class="err" id="regMsg"></div>
+<button class="btn btn-gold" id="registerBtn" style="width:100%;margin-top:6px">إنشاء الحساب</button>
+</div>`;
+const ap=document.getElementById('adminPanel');
+if(ap) ap.parentNode.insertBefore(rp,ap);
+
+document.getElementById('ctaAdd').onclick=()=>{
+ document.getElementById('registerPanel').scrollIntoView({behavior:'smooth'});
+};
+
+document.getElementById('registerBtn').onclick=async()=>{
+ const name=document.getElementById('regName').value.trim();
+ const email=document.getElementById('regEmail').value.trim();
+ const phone=document.getElementById('regPhone').value.trim();
+ const password=document.getElementById('regPassword').value;
+ const password2=document.getElementById('regPassword2').value;
+ const msg=document.getElementById('regMsg');
+ msg.style.display='block';
+ msg.style.color='var(--danger)';
+
+ if(!name || (!email && !phone) || !password){
+  msg.textContent='الاسم ووسيلة التواصل وكلمة المرور مطلوبة';
+  return;
+ }
+ if(password.length<6){
+  msg.textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+  return;
+ }
+ if(password!==password2){
+  msg.textContent='كلمتا المرور غير متطابقتين';
+  return;
+ }
+
+ try{
+  const r=await fetch('/api/register',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({name,email:email || null,phone:phone || null,password})
+  });
+  const d=await r.json();
+  msg.textContent=d.message || 'تم إنشاء الحساب';
+  if(r.ok) msg.style.color='var(--teal)';
+ }catch(e){
+  msg.textContent='تعذر الاتصال بالخادم';
+ }
+};
+</script>

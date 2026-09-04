@@ -1,0 +1,7 @@
+node_modules/
+.env
+rihal.log
+users.json
+server-backup.js
+server.js.before-*
+*.log
